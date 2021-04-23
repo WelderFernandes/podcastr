@@ -3,6 +3,7 @@ import { ptBR } from "date-fns/locale";
 import { GetStaticPaths, GetStaticProps } from "next";
 import Image from "next/image";
 import Link from "next/link";
+import { usePlayer } from "../../contexts/PlayerContext";
 import { api } from "../../services/api";
 import { convertDurationTotimeString } from "../../utils/convertDurationToTimeString";
 import styles from "./episode.module.scss";
@@ -13,18 +14,20 @@ type Episodes = {
   thumbnail: string;
   description: string;
   members: string;
-  duration: string;
+  duration: number;
   durationAsString: string;
   url: string;
   publishedAt: string;
 };
 
 type EpisodeProps = {
-  episode: Episodes
-}
+  episode: Episodes;
+};
 
 export default function Episode({ episode }: EpisodeProps) {
 
+  const { play } = usePlayer();
+  
   return (
     <div className={styles.episode}>
       <div className={styles.thumbnailContainer}>
@@ -38,9 +41,10 @@ export default function Episode({ episode }: EpisodeProps) {
           width={700}
           height={160}
           src={episode.thumbnail}
-          objectFit="cover" />
+          objectFit="cover"
+        />
 
-        <button type="button">
+        <button type="button" onClick={() => play(episode)}>
           <img src="/play.svg" alt="Tocar episódio" />
         </button>
       </div>
@@ -53,10 +57,10 @@ export default function Episode({ episode }: EpisodeProps) {
       </header>
       <div
         className={styles.description}
-        dangerouslySetInnerHTML={{ __html: episode.description }} />
-
+        dangerouslySetInnerHTML={{ __html: episode.description }}
+      />
     </div>
-  )
+  );
 }
 
 export const getStaticPaths: GetStaticPaths = async () => {
